@@ -9,6 +9,7 @@ This repo is a working Salesforce DX scaffold focused on **fast, deterministic, 
 - **No database unless unavoidable**
 - **Mock before you insert**
 - **Unit tests > service tests > integration tests**
+- **Unit tests avoid DML/SOQL; higher tiers use only what's needed**
 - **SeeAllData=false always**
 - **Architecture enables speed**
 
@@ -130,6 +131,13 @@ Run `scripts/ci_guardrails.sh` in CI to enforce:
 - Warn on direct `Http.send` calls (use `IHttpClient` instead)
 
 The guardrail script requires `rg` (ripgrep) to be available in CI.
+
+## Git Hooks (Husky)
+
+This repo uses Husky to enforce lightweight checks on GitHub-bound changes:
+
+- `pre-commit`: runs `lint-staged` (Prettier on staged files, ESLint on LWC/Aura JS).
+- `pre-push`: runs `npm test` and `scripts/ci_guardrails.sh`.
 
 ## Key Files
 

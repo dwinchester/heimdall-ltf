@@ -50,7 +50,7 @@ sf project deploy start --source-dir force-app
 Run all Apex tests:
 
 ```bash
-sf apex run test --test-level RunLocalTests --result-format human
+sf apex run test --test-level RunLocalTests --result-format human --synchronous
 ```
 
 Run a single test class (example):
@@ -124,6 +124,15 @@ Patterns to copy:
 Example you can follow:
 - `test/unit/AccountServiceTest.cls` (constructor injection with a mock selector)
 - `test/unit/ExampleIntegrationServiceTest.cls` (register mocks into `ServiceRegistry`)
+
+---
+
+### 6.1) Test rubric (quick decision guide)
+
+- **Unit tests (`test/unit/`)**: no DML or SOQL so they stay deterministic and fast.
+- **Service tests (`test/service/`)**: minimal DML/SOQL to validate persistence without full platform noise.
+- **Integration tests (`test/integration/`)**: full stack (triggers/async/callouts) to prove wiring works end-to-end.
+- **Test utils & mocks (`test/utils/`, `test/mocks/`)**: no DML/SOQL so they are safe to reuse everywhere.
 
 ---
 
