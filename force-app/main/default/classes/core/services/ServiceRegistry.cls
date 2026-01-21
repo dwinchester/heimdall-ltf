@@ -32,6 +32,13 @@ public class ServiceRegistry {
             return services.get(iface);
         }
 
+        if (Test.isRunningTest()) {
+            throw new ServiceException(
+                'No service registered for ' + String.valueOf(iface) +
+                '. Tests should call TestServiceRegistry.reset() or register mocks explicitly.'
+            );
+        }
+
         // Lazy bootstrap so callers (like triggers) don't need an explicit init call.
         if (!bootstrapped) {
             bootstrapped = true;
