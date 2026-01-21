@@ -2,7 +2,10 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CLASSES_DIR="$ROOT_DIR/force-app/main/default/classes"
+CLASSES_DIRS=(
+  "$ROOT_DIR/force-app/main/default/classes"
+  "$ROOT_DIR/examples/force-app/main/default/classes"
+)
 
 echo "Running DI/architecture guardrails..."
 
@@ -14,20 +17,27 @@ fail() {
 run_search() {
   local pattern="$1"
   local exclude_file="${2:-}"
+  local class_dir
 
-  if command -v rg >/dev/null 2>&1; then
-    if [[ -n "$exclude_file" ]]; then
-      rg -n "$pattern" "$CLASSES_DIR" --glob "!**/$exclude_file"
-    else
-      rg -n "$pattern" "$CLASSES_DIR"
+  for class_dir in "${CLASSES_DIRS[@]}"; do
+    if [[ ! -d "$class_dir" ]]; then
+      continue
     fi
-  else
-    if [[ -n "$exclude_file" ]]; then
-      grep -R -n -E --exclude="$exclude_file" "$pattern" "$CLASSES_DIR"
+
+    if command -v rg >/dev/null 2>&1; then
+      if [[ -n "$exclude_file" ]]; then
+        rg -n "$pattern" "$class_dir" --glob "!**/$exclude_file"
+      else
+        rg -n "$pattern" "$class_dir"
+      fi
     else
-      grep -R -n -E "$pattern" "$CLASSES_DIR"
+      if [[ -n "$exclude_file" ]]; then
+        grep -R -n -E --exclude="$exclude_file" "$pattern" "$class_dir"
+      else
+        grep -R -n -E "$pattern" "$class_dir"
+      fi
     fi
-  fi
+  done
 }
 
 # 1) No direct selector/service instantiation outside ProductionServices.
