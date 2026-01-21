@@ -3,6 +3,10 @@
     {
       "path": "force-app",
       "default": true
+    },
+    {
+      "path": "examples/force-app",
+      "default": false
     }
   ],
   "name": "heimdall-ltf",

@@ -23,6 +23,10 @@ public class ServiceRegistry {
         services.put(iface, impl);
     }
 
+    public static Boolean isRegistered(Type iface) {
+        return services.containsKey(iface);
+    }
+
     public static Object resolve(Type iface) {
         if (services.containsKey(iface)) {
             return services.get(iface);

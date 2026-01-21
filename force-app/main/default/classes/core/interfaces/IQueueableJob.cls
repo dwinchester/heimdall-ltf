@@ -5,7 +5,6 @@
  * - unit testing queueable logic without enqueuing jobs
  * - invoking the same business logic synchronously when appropriate
  *
- * @see AccountQueueable
  * @see NoopQueueableJob
  */
 public interface IQueueableJob {

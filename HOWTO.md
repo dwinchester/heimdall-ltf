@@ -3,11 +3,12 @@
 This repository is an SFDX project that demonstrates how to build **fast, deterministic, maintainable Apex tests** by structuring production code for **dependency injection (DI)** and **mocking**.
 
 It includes:
-- A thin trigger entrypoint (`AccountTrigger.trigger`)
 - A simple trigger framework (`TriggerHandler` + `TriggerRouter`)
 - A small DI registry (`ServiceRegistry` + `ProductionServices` + `TestServiceRegistry`)
 - Example “platform wrappers” (`IHttpClient`, `IClock`, `IAsyncEnqueuer`, `IEventBus`) for testability
+- A DML abstraction (`IRecordMutator`) for insert/update/delete
 - A test taxonomy (`unit/`, `service/`, `integration/`) that matches the docs in `README.md`
+- An Account demo package under `examples/` (triggers, selectors, and tests)
 
 ---
 
@@ -43,6 +44,14 @@ sf config set target-org=heimdall-ltf
 sf project deploy start --source-dir force-app
 ```
 
+Deploy the demo package (optional):
+
+```bash
+sf project deploy start --source-dir examples/force-app
+```
+
+The demo package depends on the framework in `force-app`, so deploy the framework first.
+
 ---
 
 ### 3) Run the tests
@@ -65,11 +74,11 @@ sf apex run test --tests ExampleIntegrationServiceTest --result-format human
 
 #### Trigger pattern (keep triggers thin)
 
-- **Trigger file**: `force-app/main/default/triggers/AccountTrigger.trigger`
+- **Trigger file**: `examples/force-app/main/default/triggers/AccountTrigger.trigger`
   - Contains only routing logic.
 - **Router**: `core/domain/TriggerRouter.cls`
   - Dispatches to the correct handler method based on trigger context.
-- **Handler**: `core/domain/AccountTriggerHandler.cls`
+- **Handler**: `examples/force-app/main/default/classes/demo/domain/AccountTriggerHandler.cls`
   - Contains the business logic for the trigger and resolves dependencies via `ServiceRegistry`.
 
 The intent is:
@@ -87,18 +96,25 @@ The intent is:
 
 This is how production code avoids directly calling “hard dependencies” (SOQL, callouts, async, event publishing):
 - Put the contract in `core/interfaces/*`
-- Put the real implementation in `core/utils/*` or `core/selectors/*`
+- Put the real implementation in `core/infrastructure/*` or `core/selectors/*`
 - Register implementations in `ProductionServices.registerAll()`
 - Resolve by interface `Type` via `ServiceRegistry.resolve(...)`
+
+The DML wrapper follows the same pattern:
+- Interface: `core/interfaces/IRecordMutator.cls`
+- Implementation: `core/infrastructure/SystemRecordMutator.cls`
+- Test double: `test/mocks/MockRecordMutator.cls`
 
 ---
 
 ### 5) Demo scenario: the Account trigger updates Description after insert
 
-In this template, inserting an `Account` runs `AccountTriggerHandler.afterInsert(...)` and updates the record’s `Description`.
+In this template, inserting an `Account` runs `AccountTriggerHandler.afterInsert(...)` and updates the record’s `Description`. The demo lives in `examples/`.
+
+Demo-specific bindings (like `IAccountSelector`) are registered in `DemoServices`.
 
 To see that end-to-end behavior, run the integration test:
-- `force-app/main/default/classes/test/integration/AccountTriggerHandlerIntegrationTest.cls`
+- `examples/force-app/main/default/classes/test/integration/AccountTriggerHandlerIntegrationTest.cls`
 
 That test demonstrates the key idea:
 - Reset DI bindings for isolation
@@ -117,13 +133,15 @@ Unit tests should prefer:
 - No callouts
 
 Patterns to copy:
-- Extend `BaseTest` (`test/utils/BaseTest.cls`) so every test can:
+- Extend `BaseTest` (`test/helpers/BaseTest.cls`) so every test can:
   - reset the registry
   - enforce fast-test guardrails via `TestLimits`
 
 Example you can follow:
-- `test/unit/AccountServiceTest.cls` (constructor injection with a mock selector)
-- `test/unit/ExampleIntegrationServiceTest.cls` (register mocks into `ServiceRegistry`)
+- `examples/force-app/main/default/classes/test/unit/AccountServiceTest.cls` (constructor injection with a mock selector)
+- `examples/force-app/main/default/classes/test/unit/ExampleIntegrationServiceTest.cls` (register mocks into `ServiceRegistry`)
+- `examples/force-app/main/default/classes/test/unit/RecordMutatorTest.cls` (record mutator wiring without DML)
+- `force-app/main/default/classes/test/unit/RecordMutatorDmlTest.cls` (record mutator behavior with real DML)
 
 ---
 
@@ -132,7 +150,7 @@ Example you can follow:
 - **Unit tests (`test/unit/`)**: no DML or SOQL so they stay deterministic and fast.
 - **Service tests (`test/service/`)**: minimal DML/SOQL to validate persistence without full platform noise.
 - **Integration tests (`test/integration/`)**: full stack (triggers/async/callouts) to prove wiring works end-to-end.
-- **Test utils & mocks (`test/utils/`, `test/mocks/`)**: no DML/SOQL so they are safe to reuse everywhere.
+- **Test helpers & mocks (`test/helpers/`, `test/mocks/`)**: no DML/SOQL so they are safe to reuse everywhere.
 
 ---
 
@@ -141,7 +159,7 @@ Example you can follow:
 When you introduce a new “hard dependency” (SOQL, callout, async, platform API), follow this sequence:
 
 1) Define an interface in `core/interfaces/`
-2) Implement it in `core/utils/` (or `core/selectors/` for SOQL)
+2) Implement it in `core/infrastructure/` (or `core/selectors/` for SOQL)
 3) Register it in `ProductionServices.registerAll()`
 4) Write unit tests that register a mock via `TestServiceRegistry.registerMock(...)`
 
