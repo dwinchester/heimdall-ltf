@@ -11,26 +11,29 @@ public class MockRecordMutator implements IRecordMutator {
     public List<SObject> deleted = new List<SObject>();
 
     public Database.SaveResult[] insertRecords(List<SObject> recordsToInsert) {
-        insertCount++;
-        if (recordsToInsert != null) {
-            inserted.addAll(recordsToInsert);
+        if (recordsToInsert == null || recordsToInsert.isEmpty()) {
+            return new Database.SaveResult[] {};
         }
+        insertCount++;
+        inserted.addAll(recordsToInsert);
         return new Database.SaveResult[] {};
     }
 
     public Database.SaveResult[] updateRecords(List<SObject> recordsToUpdate) {
-        updateCount++;
-        if (recordsToUpdate != null) {
-            updated.addAll(recordsToUpdate);
+        if (recordsToUpdate == null || recordsToUpdate.isEmpty()) {
+            return new Database.SaveResult[] {};
         }
+        updateCount++;
+        updated.addAll(recordsToUpdate);
         return new Database.SaveResult[] {};
     }
 
     public Database.DeleteResult[] deleteRecords(List<SObject> recordsToDelete) {
-        deleteCount++;
-        if (recordsToDelete != null) {
-            deleted.addAll(recordsToDelete);
+        if (recordsToDelete == null || recordsToDelete.isEmpty()) {
+            return new Database.DeleteResult[] {};
         }
+        deleteCount++;
+        deleted.addAll(recordsToDelete);
         return new Database.DeleteResult[] {};
     }
 }
