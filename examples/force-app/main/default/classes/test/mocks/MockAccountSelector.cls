@@ -19,4 +19,17 @@ public class MockAccountSelector implements IAccountSelector {
         }
         return results;
     }
+
+    public List<Account> getAccountsByRegion(String region) {
+        if (String.isBlank(region)) {
+            return new List<Account>();
+        }
+        List<Account> matches = new List<Account>();
+        for (Account acct : TestDataFactory.mockAccounts()) {
+            if (acct.BillingState == region) {
+                matches.add(acct);
+            }
+        }
+        return matches;
+    }
 }

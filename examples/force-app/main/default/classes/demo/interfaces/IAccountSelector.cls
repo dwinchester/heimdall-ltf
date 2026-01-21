@@ -20,4 +20,14 @@ public interface IAccountSelector {
      * @return Map of Accounts keyed by Id
      */
     Map<Id, Account> getByIds(Set<Id> accountIds);
+
+    /**
+     * Fetches Accounts for a given region.
+     *
+     * Region is modeled by {@code BillingState} in this example.
+     *
+     * @param region Billing state to filter by
+     * @return List of Accounts in the region
+     */
+    List<Account> getAccountsByRegion(String region);
 }

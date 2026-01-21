@@ -34,4 +34,22 @@ public class AccountSelector implements IAccountSelector {
             WHERE Id IN :accountIds
         ]);
     }
+
+    /**
+     * Fetches Accounts for a given region.
+     *
+     * Region is modeled by {@code BillingState} in this example.
+     * Returns an empty list when {@code region} is blank.
+     */
+    public List<Account> getAccountsByRegion(String region) {
+        if (String.isBlank(region)) {
+            return new List<Account>();
+        }
+
+        return [
+            SELECT Id, Name, Description, BillingState
+            FROM Account
+            WHERE BillingState = :region
+        ];
+    }
 }
