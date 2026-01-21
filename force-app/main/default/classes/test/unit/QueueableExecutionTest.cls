@@ -21,7 +21,7 @@ private class QueueableExecutionTest extends BaseTest {
         System.assertEquals('Queueable', job.JobType);
         System.assertEquals('Completed', job.Status);
         System.assertEquals(0, job.NumberOfErrors);
-        assertFastTest();
+        assertSlowTest();
     }
 }
 

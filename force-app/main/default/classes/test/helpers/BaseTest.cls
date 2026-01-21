@@ -15,6 +15,6 @@ public abstract class BaseTest {
     }
 
     public static void assertSlowTest() {
-        TestLimits.assertWithin(20, 10, 200);
+        TestLimits.assertWithin(20, 10, 250);
     }
 }

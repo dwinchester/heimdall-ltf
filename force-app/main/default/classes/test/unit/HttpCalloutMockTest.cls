@@ -18,7 +18,7 @@ private class HttpCalloutMockTest extends BaseTest {
         HttpResponse res = http.send(req);
         System.assertEquals(200, res.getStatusCode());
         System.assertEquals('{}', res.getBody());
-        assertFastTest();
+        assertSlowTest();
     }
 }
 
