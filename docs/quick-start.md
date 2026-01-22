@@ -29,6 +29,15 @@ sf org login web --set-default-dev-hub --alias DevHub
 sf org create scratch --definition-file config/project-scratch-def.json --set-default --alias heimdall-ltf
 ```
 
+Or run the helper script:
+
+```bash
+./scripts/setup_scratch_org.sh heimdall-ltf DevHub
+```
+
+Note: the script currently skips the core deploy. Run `sf project deploy start --source-dir force-app`
+afterward or uncomment the lines in `scripts/setup_scratch_org.sh`.
+
 Or, if deploying to an existing org:
 
 ```bash

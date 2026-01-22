@@ -5,6 +5,7 @@ This repo is a working Salesforce DX scaffold focused on **fast, deterministic, 
 > The name "Heimdall" nods to the vigilant guardian in Norse myth, reflecting the project goal of guarding test speed and determinism; LTF stands for Lightning Test Framework.
 
 Start here: see the [Quick Start](docs/quick-start.md) for a copy/paste setup and your first DML-less unit test.
+Scratch org setup script: `./scripts/setup_scratch_org.sh`.
 
 ## Core Principles
 
