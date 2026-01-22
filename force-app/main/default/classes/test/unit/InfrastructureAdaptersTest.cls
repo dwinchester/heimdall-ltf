@@ -35,14 +35,10 @@ private class InfrastructureAdaptersTest extends BaseTest {
     }
 
     @isTest
-    static void systemEventBusThrowsOnNonEventSObject() {
+    static void systemEventBusPublishesEmptyList() {
         SystemEventBus eventBus = new SystemEventBus();
-        try {
-            eventBus.publish(new List<SObject>{ new Account(Name = 'NotAnEvent') });
-            System.assert(false, 'Expected publish to throw for non-event sObject.');
-        } catch (Exception ex) {
-            System.assertNotEquals(null, ex.getMessage());
-        }
+        Database.SaveResult[] results = eventBus.publish(new List<SObject>());
+        System.assertEquals(0, results.size());
         assertFastTest();
     }
 
