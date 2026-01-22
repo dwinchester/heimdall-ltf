@@ -8,11 +8,15 @@
  */
 @isTest
 public class TestBootstrap {
+    private static Boolean strictMode = false;
+
     public static void defaults() {
+        strictMode = false;
         TestServiceRegistry.reset();
     }
 
     public static void strict() {
+        strictMode = true;
         TestServiceRegistry.reset();
         TestServiceRegistry.registerMock(IHttpClient.class, new StrictHttpClient());
         TestServiceRegistry.registerMock(IAsyncEnqueuer.class, new StrictAsyncEnqueuer());
@@ -21,11 +25,24 @@ public class TestBootstrap {
     }
 
     public static void init(Boolean strictMode) {
-        if (strictMode == true) {
+        setStrictMode(strictMode);
+        reset();
+    }
+
+    public static void setStrictMode(Boolean strictMode) {
+        TestBootstrap.strictMode = strictMode == true;
+    }
+
+    public static Boolean isStrictMode() {
+        return strictMode;
+    }
+
+    public static void reset() {
+        if (strictMode) {
             strict();
-        } else {
-            defaults();
+            return;
         }
+        defaults();
     }
 
     private class StrictHttpClient implements IHttpClient {
