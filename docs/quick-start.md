@@ -115,6 +115,24 @@ private class StrictModeExampleTest extends BaseTest {
 }
 ```
 
+### Strictness toggle (gradual adoption)
+
+Teams can start permissive and tighten later with a single toggle:
+
+```apex
+@isTest
+private class StrictnessToggleExampleTest extends BaseTest {
+    @isTest
+    static void canToggleStrictness() {
+        TestBootstrap.setStrictMode(false);
+        TestBootstrap.reset();
+
+        TestBootstrap.setStrictMode(true);
+        TestBootstrap.reset();
+    }
+}
+```
+
 Run it:
 
 ```bash
