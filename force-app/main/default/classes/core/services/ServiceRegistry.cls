@@ -35,7 +35,7 @@ public class ServiceRegistry {
         if (Test.isRunningTest()) {
             throw new ServiceException(
                 'No service registered for ' + String.valueOf(iface) +
-                '. Tests should call TestServiceRegistry.reset() or register mocks explicitly.'
+                '. Tests should call TestServiceRegistry.reset() or register a mock before resolving.'
             );
         }
 
@@ -49,7 +49,10 @@ public class ServiceRegistry {
             return services.get(iface);
         }
 
-        throw new ServiceException('No service registered for ' + String.valueOf(iface));
+        throw new ServiceException(
+            'No service registered for ' + String.valueOf(iface) +
+            '. Bind an implementation in ProductionServices.registerAll() or register manually.'
+        );
     }
 
     @TestVisible
