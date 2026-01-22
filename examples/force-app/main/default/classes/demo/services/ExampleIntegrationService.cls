@@ -9,16 +9,11 @@
  * In real services, validate inputs, handle errors explicitly, and consider retries/timeouts.
  */
 public class ExampleIntegrationService {
-    private final IHttpClient httpClient;
-    private final IAsyncEnqueuer asyncEnqueuer;
-    private final IEventBus eventBus;
+    private IHttpClient httpClient;
+    private IAsyncEnqueuer asyncEnqueuer;
+    private IEventBus eventBus;
 
     public ExampleIntegrationService() {
-        this(
-            (IHttpClient) ServiceRegistry.resolve(IHttpClient.class),
-            (IAsyncEnqueuer) ServiceRegistry.resolve(IAsyncEnqueuer.class),
-            (IEventBus) ServiceRegistry.resolve(IEventBus.class)
-        );
     }
 
     public ExampleIntegrationService(
@@ -40,11 +35,24 @@ public class ExampleIntegrationService {
      * @return A summary of the actions performed
      */
     public ExampleResult runExample(HttpRequest request, Queueable job, List<SObject> eventsToPublish) {
+        ensureDependencies();
         HttpResponse response = httpClient.send(request);
         Id jobId = asyncEnqueuer.enqueue(job);
         Database.SaveResult[] results = eventBus.publish(eventsToPublish);
         Integer publishedCount = results == null ? 0 : results.size();
         return new ExampleResult(response.getStatusCode(), jobId, publishedCount);
+    }
+
+    private void ensureDependencies() {
+        if (httpClient == null) {
+            httpClient = (IHttpClient) ServiceRegistry.resolve(IHttpClient.class);
+        }
+        if (asyncEnqueuer == null) {
+            asyncEnqueuer = (IAsyncEnqueuer) ServiceRegistry.resolve(IAsyncEnqueuer.class);
+        }
+        if (eventBus == null) {
+            eventBus = (IEventBus) ServiceRegistry.resolve(IEventBus.class);
+        }
     }
 
     public class ExampleResult {

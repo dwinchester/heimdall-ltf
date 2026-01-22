@@ -8,8 +8,9 @@
 private class AccountTriggerHandlerIntegrationTest extends BaseTest {
     @isTest
     static void afterInsertUsesMockSelector() {
-        resetRegistry();
+        TestBootstrap.defaults();
         TestServiceRegistry.registerMock(IAccountSelector.class, new MockAccountSelector());
+        TestServiceRegistry.registerMock(IRecordMutator.class, new SystemRecordMutator());
         Account acc = TestDataFactory.account(false);
         insert acc;
 

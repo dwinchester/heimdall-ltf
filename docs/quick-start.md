@@ -261,6 +261,27 @@ Minimum mocking guidance:
 
 ---
 
+### 8.2) Seed recipes (minimal setup)
+
+These examples are intended to be copied into real projects with minimal setup.
+
+Trigger recipe (thin trigger + handler + integration test):
+- Handler: `examples/force-app/main/default/classes/demo/domain/AccountTriggerHandler.cls`
+- Trigger: `examples/force-app/main/default/triggers/AccountTrigger.trigger`
+- Integration test: `examples/force-app/main/default/classes/test/integration/AccountTriggerHandlerIntegrationTest.cls`
+
+Service recipe (pure service composition):
+- Service: `examples/force-app/main/default/classes/demo/services/OpportunityPipelineService.cls`
+- Unit test: `examples/force-app/main/default/classes/test/unit/OpportunityPipelineServiceTest.cls`
+
+Integration recipe (callout + async + event orchestration):
+- Service: `examples/force-app/main/default/classes/demo/services/ExampleIntegrationService.cls`
+- Unit test: `examples/force-app/main/default/classes/test/unit/ExampleIntegrationServiceTest.cls`
+
+Each test starts with `TestBootstrap.defaults()` and registers only what it needs.
+
+---
+
 ### 9) CI guardrails (keep the architecture honest)
 
 This repo includes `scripts/ci_guardrails.sh` to enforce two rules:

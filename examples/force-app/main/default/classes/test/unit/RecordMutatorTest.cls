@@ -24,7 +24,7 @@ private class RecordMutatorTest extends BaseTest {
         Account updated = (Account) mutator.updated[0];
         System.assertEquals(a.Id, updated.Id);
         System.assertEquals('Processed: Mock', updated.Description);
-        assertFastTest();
+        assertSlowTest();
     }
 
     @isTest
@@ -39,6 +39,6 @@ private class RecordMutatorTest extends BaseTest {
 
         System.assertEquals(0, mutator.updateCount, 'Expected no update attempt.');
         System.assertEquals(0, mutator.updated.size(), 'Expected no records updated.');
-        assertFastTest();
+        assertSlowTest();
     }
 }

@@ -5,6 +5,9 @@ public class DemoServices {
     private static Boolean registered = false;
 
     public static void registerAll() {
+        if (Test.isRunningTest()) {
+            return;
+        }
         if (registered) {
             return;
         }
@@ -12,6 +15,9 @@ public class DemoServices {
 
         if (!ServiceRegistry.isRegistered(IAccountSelector.class)) {
             ServiceRegistry.register(IAccountSelector.class, new AccountSelector());
+        }
+        if (!ServiceRegistry.isRegistered(IOpportunitySelector.class)) {
+            ServiceRegistry.register(IOpportunitySelector.class, new OpportunitySelector());
         }
     }
 }

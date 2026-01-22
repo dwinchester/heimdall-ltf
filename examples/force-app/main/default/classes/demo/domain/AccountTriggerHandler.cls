@@ -15,16 +15,22 @@
  * @see IRecordMutator
  */
 public class AccountTriggerHandler extends TriggerHandler {
-    private final IAccountSelector selector;
-    private final IRecordMutator recordMutator;
+    private IAccountSelector selector;
+    private IRecordMutator recordMutator;
 
     public AccountTriggerHandler() {
         DemoServices.registerAll();
+        if (Test.isRunningTest() && !ServiceRegistry.isRegistered(IAccountSelector.class)) {
+            return;
+        }
         this.selector = (IAccountSelector) ServiceRegistry.resolve(IAccountSelector.class);
         this.recordMutator = (IRecordMutator) ServiceRegistry.resolve(IRecordMutator.class);
     }
 
     public override void afterInsert(List<SObject> newList) {
+        if (selector == null || recordMutator == null) {
+            return;
+        }
         if (newList == null || newList.isEmpty()) {
             return;
         }

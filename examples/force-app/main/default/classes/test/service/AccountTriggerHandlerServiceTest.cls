@@ -8,6 +8,8 @@ private class AccountTriggerHandlerServiceTest extends BaseTest {
     @isTest
     static void updatesFieldOnInsert() {
         resetRegistry();
+        TestServiceRegistry.registerMock(IAccountSelector.class, new MockAccountSelector());
+
         Account a = TestDataFactory.account(true);
         a.Description = 'Updated';
         update a;

@@ -32,4 +32,13 @@ public class MockAccountSelector implements IAccountSelector {
         }
         return matches;
     }
+
+    public List<Account> getOwnedByUser(Id ownerId) {
+        if (ownerId == null) {
+            return new List<Account>();
+        }
+        return new List<Account>{
+            new Account(Id = '001000000000002AAA', Name = 'Mock Owned', OwnerId = ownerId)
+        };
+    }
 }

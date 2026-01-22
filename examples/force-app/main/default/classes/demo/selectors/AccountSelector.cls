@@ -52,4 +52,21 @@ public class AccountSelector implements IAccountSelector {
             WHERE BillingState = :region
         ];
     }
+
+    /**
+     * Fetches Accounts owned by a user.
+     *
+     * Returns an empty list when {@code ownerId} is null.
+     */
+    public List<Account> getOwnedByUser(Id ownerId) {
+        if (ownerId == null) {
+            return new List<Account>();
+        }
+
+        return [
+            SELECT Id, Name, Description, OwnerId
+            FROM Account
+            WHERE OwnerId = :ownerId
+        ];
+    }
 }

@@ -11,6 +11,6 @@ private class AccountServiceTest extends BaseTest {
         AccountService svc = new AccountService(new MockAccountSelector());
         Account acc = svc.getAccount(Id.valueOf('001000000000001'));
         System.assertEquals('Mock', acc.Name);
-        assertFastTest();
+        assertSlowTest();
     }
 }

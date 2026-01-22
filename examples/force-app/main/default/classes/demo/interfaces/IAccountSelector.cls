@@ -30,4 +30,12 @@ public interface IAccountSelector {
      * @return List of Accounts in the region
      */
     List<Account> getAccountsByRegion(String region);
+
+    /**
+     * Fetches Accounts owned by a user.
+     *
+     * @param ownerId Owner Id to filter by
+     * @return List of Accounts owned by the user
+     */
+    List<Account> getOwnedByUser(Id ownerId);
 }
