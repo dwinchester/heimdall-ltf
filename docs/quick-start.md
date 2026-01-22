@@ -238,6 +238,29 @@ This keeps production code testable and makes unit tests fast.
 
 ---
 
+### 8.1) Core vs optional interfaces (what must be mocked)
+
+Core interfaces are assumed by the framework and should be safe to resolve in tests.
+Optional interfaces are app-specific and only needed where you use them.
+
+Core interfaces (provided by `core/interfaces`):
+- `IHttpClient` (callouts)
+- `IAsyncEnqueuer` (queueable enqueue)
+- `IEventBus` (platform events)
+- `IClock` (time)
+- `IQueueableJob` (syncable queueable work)
+- `IRecordMutator` (DML)
+
+Optional interfaces (examples only, used when you adopt them in your app):
+- `IAccountSelector`
+- `IOpportunitySelector`
+
+Minimum mocking guidance:
+- **Unit tests**: mock any interface your code resolves, plus any optional interfaces used by triggers.
+- **Service/integration tests**: you can use real implementations selectively, but register mocks to avoid callouts/async/events unless you explicitly test those paths.
+
+---
+
 ### 9) CI guardrails (keep the architecture honest)
 
 This repo includes `scripts/ci_guardrails.sh` to enforce two rules:
