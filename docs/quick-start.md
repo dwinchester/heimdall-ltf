@@ -72,14 +72,14 @@ sf apex run test --tests ExampleIntegrationServiceTest --result-format human
 
 ### 4) First DML-less unit test (copy/paste)
 
-Create a unit test that uses DI and mocks:
+Create a unit test that uses DI and mocks. Prefer the drop-in bootstrap helper:
 
 ```apex
 @isTest
 private class QuickStartExampleTest extends BaseTest {
     @isTest
     static void resolvesMocksAfterReset() {
-        resetRegistry();
+        TestBootstrap.defaults();
 
         TestServiceRegistry.registerMock(IHttpClient.class, new MockHttpClient());
         TestServiceRegistry.registerMock(IAsyncEnqueuer.class, new MockAsyncEnqueuer());
@@ -98,6 +98,19 @@ private class QuickStartExampleTest extends BaseTest {
 
         System.assertEquals(200, result.statusCode);
         assertFastTest();
+    }
+}
+```
+
+Strict mode fails fast if test code attempts DML, callouts, async enqueue, or event publish:
+
+```apex
+@isTest
+private class StrictModeExampleTest extends BaseTest {
+    @isTest
+    static void disallowsPlatformSideEffects() {
+        TestBootstrap.strict();
+        // Test logic here
     }
 }
 ```
