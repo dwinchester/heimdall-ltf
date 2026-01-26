@@ -2,7 +2,7 @@
  * Account trigger domain logic (template example).
  *
  * Demonstrates:
- * - Dependency resolution via {@link ServiceRegistry} (selector + mutator)
+ * - Dependency resolution via {@link ServiceRegistry} (repository + mutator)
  * - Bulk-safe shaping of data (collect Ids, query once, update as a list)
  *
  * Caution:
@@ -11,24 +11,22 @@
  *
  * @see TriggerRouter
  * @see ServiceRegistry
- * @see IAccountSelector
+ * @see IAccountRepository
  * @see IRecordMutator
  */
 public class AccountTriggerHandler extends TriggerHandler {
-    private IAccountSelector selector;
-    private IRecordMutator recordMutator;
+    private IAccountRepository repository;
 
     public AccountTriggerHandler() {
         DemoServices.registerAll();
-        if (Test.isRunningTest() && !ServiceRegistry.isRegistered(IAccountSelector.class)) {
+        if (Test.isRunningTest() && !ServiceRegistry.isRegistered(IAccountRepository.class)) {
             return;
         }
-        this.selector = (IAccountSelector) ServiceRegistry.resolve(IAccountSelector.class);
-        this.recordMutator = (IRecordMutator) ServiceRegistry.resolve(IRecordMutator.class);
+        this.repository = (IAccountRepository) ServiceRegistry.resolve(IAccountRepository.class);
     }
 
     public override void afterInsert(List<SObject> newList) {
-        if (selector == null || recordMutator == null) {
+        if (repository == null) {
             return;
         }
         if (newList == null || newList.isEmpty()) {
@@ -50,7 +48,7 @@ public class AccountTriggerHandler extends TriggerHandler {
             accountIds.add(acc.Id);
         }
 
-        Map<Id, Account> fullAccounts = selector.getByIds(accountIds);
+        Map<Id, Account> fullAccounts = repository.getByIds(accountIds);
         List<Account> updates = new List<Account>();
         for (Account acc : newAccounts) {
             Account fullAcc = fullAccounts.get(acc.Id);
@@ -60,6 +58,6 @@ public class AccountTriggerHandler extends TriggerHandler {
             ));
         }
 
-        recordMutator.updateRecords(updates);
+        repository.updateRecords(updates);
     }
 }

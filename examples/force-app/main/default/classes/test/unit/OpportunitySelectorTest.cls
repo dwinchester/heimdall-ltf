@@ -6,7 +6,7 @@ private class OpportunitySelectorTest extends BaseTest {
     @isTest
     static void getByAccountIdReturnsMatches() {
         resetRegistry();
-        TestServiceRegistry.registerMock(IAccountSelector.class, new MockAccountSelector());
+        TestServiceRegistry.registerMock(IAccountRepository.class, new MockAccountRepository());
 
         Account east = new Account(Name = 'East Account', BillingState = 'East');
         Account west = new Account(Name = 'West Account', BillingState = 'West');
@@ -48,7 +48,7 @@ private class OpportunitySelectorTest extends BaseTest {
     @isTest
     static void getCountsAndAmountsByRegionReturnsAggregate() {
         resetRegistry();
-        TestServiceRegistry.registerMock(IAccountSelector.class, new MockAccountSelector());
+        TestServiceRegistry.registerMock(IAccountRepository.class, new MockAccountRepository());
 
         Account east = new Account(Name = 'East Account', BillingState = 'East');
         Account west = new Account(Name = 'West Account', BillingState = 'West');
@@ -92,7 +92,7 @@ private class OpportunitySelectorTest extends BaseTest {
     @isTest
     static void getClosingThisQuarterReturnsMatches() {
         resetRegistry();
-        TestServiceRegistry.registerMock(IAccountSelector.class, new MockAccountSelector());
+        TestServiceRegistry.registerMock(IAccountRepository.class, new MockAccountRepository());
 
         User otherUser = new User(
             Username = 'other.user.' + DateTime.now().getTime() + '@example.com',
@@ -153,6 +153,55 @@ private class OpportunitySelectorTest extends BaseTest {
         System.assertEquals(1, results.size());
         System.assertEquals(east.Id, results[0].AccountId);
         System.assertEquals(UserInfo.getUserId(), results[0].OwnerId);
+        assertSlowTest();
+    }
+
+    @isTest
+    static void getByIdReturnsOpportunity() {
+        resetRegistry();
+        Account acct = new Account(Name = 'Test Account');
+        insert acct;
+        Opportunity opp = new Opportunity(
+            Name = 'Target',
+            StageName = 'Prospecting',
+            CloseDate = Date.today(),
+            AccountId = acct.Id
+        );
+        insert opp;
+
+        OpportunitySelector selector = new OpportunitySelector();
+        Opportunity result = selector.getById(opp.Id);
+
+        System.assertEquals(opp.Id, result.Id);
+        System.assertEquals(opp.Name, result.Name);
+        assertSlowTest();
+    }
+
+    @isTest
+    static void getByIdsReturnsMap() {
+        resetRegistry();
+        Account acct = new Account(Name = 'Test Account');
+        insert acct;
+        Opportunity o1 = new Opportunity(
+            Name = 'One',
+            StageName = 'Prospecting',
+            CloseDate = Date.today(),
+            AccountId = acct.Id
+        );
+        Opportunity o2 = new Opportunity(
+            Name = 'Two',
+            StageName = 'Prospecting',
+            CloseDate = Date.today(),
+            AccountId = acct.Id
+        );
+        insert new List<Opportunity>{ o1, o2 };
+
+        OpportunitySelector selector = new OpportunitySelector();
+        Map<Id, Opportunity> results = selector.getByIds(new Set<Id>{ o1.Id, o2.Id });
+
+        System.assertEquals(2, results.size());
+        System.assertEquals('One', results.get(o1.Id).Name);
+        System.assertEquals('Two', results.get(o2.Id).Name);
         assertSlowTest();
     }
 }

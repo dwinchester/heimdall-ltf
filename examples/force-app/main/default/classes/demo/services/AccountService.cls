@@ -1,13 +1,13 @@
 /**
  * Example service that demonstrates constructor injection.
  *
- * This class is intentionally thin: it delegates data access to {@link IAccountSelector}.
+ * This class is intentionally thin: it delegates data access to {@link IAccountRepository}.
  */
 public class AccountService {
-    private final IAccountSelector selector;
+    private final IAccountRepository repository;
 
-    public AccountService(IAccountSelector selector) {
-        this.selector = selector;
+    public AccountService(IAccountRepository repository) {
+        this.repository = repository;
     }
 
     /**
@@ -17,6 +17,6 @@ public class AccountService {
      * @return Account record
      */
     public Account getAccount(Id accountId) {
-        return selector.getById(accountId);
+        return repository.getById(accountId);
     }
 }

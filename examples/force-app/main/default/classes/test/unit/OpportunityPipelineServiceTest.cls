@@ -7,8 +7,8 @@ private class OpportunityPipelineServiceTest extends BaseTest {
     static void returnsMyEastOpportunitiesAndAccounts() {
         TestBootstrap.defaults();
         OpportunityPipelineService svc = new OpportunityPipelineService(
-            new MockAccountSelector(),
-            new MockOpportunitySelector()
+            new MockAccountRepository(),
+            new MockOpportunityRepository()
         );
 
         List<Opportunity> opps = svc.getMyOpportunitiesClosingThisQuarter();

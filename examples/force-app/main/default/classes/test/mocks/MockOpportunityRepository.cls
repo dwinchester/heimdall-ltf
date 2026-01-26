@@ -1,8 +1,15 @@
 /**
- * Test double for {@link IOpportunitySelector} that returns predictable Opportunity records.
+ * Test double for {@link IOpportunityRepository} that returns predictable Opportunity records.
  */
 @isTest
-public class MockOpportunitySelector implements IOpportunitySelector {
+public class MockOpportunityRepository implements IOpportunityRepository {
+    public Integer insertCount = 0;
+    public Integer updateCount = 0;
+    public Integer deleteCount = 0;
+    public List<Opportunity> inserted = new List<Opportunity>();
+    public List<Opportunity> updated = new List<Opportunity>();
+    public List<Opportunity> deleted = new List<Opportunity>();
+
     public Opportunity getById(Id opportunityId) {
         return new Opportunity(Id = opportunityId, Name = 'Mock Opportunity');
     }
@@ -26,9 +33,6 @@ public class MockOpportunitySelector implements IOpportunitySelector {
             new Opportunity(
                 Id = '006000000000001AAA',
                 Name = 'Mock Opportunity',
-                Amount = 100,
-                CloseDate = Date.today(),
-                StageName = 'Prospecting',
                 AccountId = accountId
             )
         };
@@ -38,27 +42,46 @@ public class MockOpportunitySelector implements IOpportunitySelector {
         if (String.isBlank(region)) {
             return new List<AggregateResult>();
         }
-        Integer totalCount = region == 'East' ? 2 : 1;
-        Decimal totalAmount = region == 'East' ? 350 : 100;
-        String payload =
-            '[{"totalCount":' + totalCount + ',"totalAmount":' + String.valueOf(totalAmount) + '}]';
-        return (List<AggregateResult>) JSON.deserialize(payload, List<AggregateResult>.class);
+        return new List<AggregateResult>();
     }
 
     public List<Opportunity> getClosingThisQuarter(String region, Id ownerId) {
-        if (String.isBlank(region) || ownerId == null || region != 'East') {
+        if (String.isBlank(region) || ownerId == null) {
             return new List<Opportunity>();
         }
         return new List<Opportunity>{
             new Opportunity(
                 Id = '006000000000002AAA',
                 Name = 'Mock East Opportunity',
-                Amount = 250,
-                CloseDate = Date.today(),
-                StageName = 'Qualification',
-                AccountId = '001000000000003AAA',
                 OwnerId = ownerId
             )
         };
+    }
+
+    public Database.SaveResult[] insertRecords(List<Opportunity> records) {
+        if (records == null || records.isEmpty()) {
+            return new Database.SaveResult[] {};
+        }
+        insertCount++;
+        inserted.addAll(records);
+        return new Database.SaveResult[] {};
+    }
+
+    public Database.SaveResult[] updateRecords(List<Opportunity> records) {
+        if (records == null || records.isEmpty()) {
+            return new Database.SaveResult[] {};
+        }
+        updateCount++;
+        updated.addAll(records);
+        return new Database.SaveResult[] {};
+    }
+
+    public Database.DeleteResult[] deleteRecords(List<Opportunity> records) {
+        if (records == null || records.isEmpty()) {
+            return new Database.DeleteResult[] {};
+        }
+        deleteCount++;
+        deleted.addAll(records);
+        return new Database.DeleteResult[] {};
     }
 }

@@ -1,10 +1,9 @@
 /**
- * Data access contract for Opportunity queries.
+ * Repository contract for Opportunity data access and persistence.
  *
- * Implementations should be bulk-safe and clearly document null/exception behavior.
- * Production implementation: {@link OpportunitySelector}.
+ * Implementations should delegate reads to {@link IOpportunitySelector} and writes to {@link IRecordMutator}.
  */
-public interface IOpportunitySelector {
+public interface IOpportunityRepository extends IBaseRepository {
     /**
      * Fetches a single Opportunity by Id.
      *

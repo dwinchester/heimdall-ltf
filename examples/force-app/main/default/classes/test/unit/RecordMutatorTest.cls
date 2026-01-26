@@ -9,8 +9,10 @@ private class RecordMutatorTest extends BaseTest {
 
         MockAccountSelector selector = new MockAccountSelector();
         MockRecordMutator mutator = new MockRecordMutator();
-        TestServiceRegistry.registerMock(IAccountSelector.class, selector);
-        TestServiceRegistry.registerMock(IRecordMutator.class, mutator);
+        TestServiceRegistry.registerMock(
+            IAccountRepository.class,
+            new AccountRepository(selector, mutator)
+        );
 
         Account a = TestDataFactory.account(false);
         a.Id = Id.valueOf('001000000000001AAA');
@@ -32,7 +34,10 @@ private class RecordMutatorTest extends BaseTest {
         resetRegistry();
 
         MockRecordMutator mutator = new MockRecordMutator();
-        TestServiceRegistry.registerMock(IRecordMutator.class, mutator);
+        TestServiceRegistry.registerMock(
+            IAccountRepository.class,
+            new AccountRepository(new MockAccountSelector(), mutator)
+        );
 
         AccountTriggerHandler handler = new AccountTriggerHandler();
         handler.afterInsert(new List<SObject>());

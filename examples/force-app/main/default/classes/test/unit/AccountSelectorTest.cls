@@ -6,7 +6,7 @@ private class AccountSelectorTest extends BaseTest {
     @testSetup
     static void setup() {
         resetRegistry();
-        TestServiceRegistry.registerMock(IAccountSelector.class, new MockAccountSelector());
+        TestServiceRegistry.registerMock(IAccountRepository.class, new MockAccountRepository());
 
         User otherUser = new User(
             Username = 'other.user.' + DateTime.now().getTime() + '@example.com',

@@ -5,6 +5,37 @@
  */
 public class OpportunitySelector implements IOpportunitySelector {
     /**
+     * Fetches a single Opportunity by Id.
+     *
+     * Note: current implementation uses a single-row SOQL query, which throws if the record
+     * does not exist. If you prefer "null when not found", change the implementation accordingly.
+     */
+    public Opportunity getById(Id opportunityId) {
+        return [
+            SELECT Id, Name, Amount, CloseDate, StageName, AccountId, OwnerId
+            FROM Opportunity
+            WHERE Id = :opportunityId
+        ];
+    }
+
+    /**
+     * Fetches Opportunities by Id as a map keyed by Id.
+     *
+     * Returns an empty map when {@code opportunityIds} is null/empty.
+     */
+    public Map<Id, Opportunity> getByIds(Set<Id> opportunityIds) {
+        if (opportunityIds == null || opportunityIds.isEmpty()) {
+            return new Map<Id, Opportunity>();
+        }
+
+        return new Map<Id, Opportunity>([
+            SELECT Id, Name, Amount, CloseDate, StageName, AccountId, OwnerId
+            FROM Opportunity
+            WHERE Id IN :opportunityIds
+        ]);
+    }
+
+    /**
      * Fetches Opportunities for a given Account.
      *
      * Returns an empty list when {@code accountId} is null.

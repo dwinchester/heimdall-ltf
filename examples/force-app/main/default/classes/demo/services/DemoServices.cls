@@ -19,5 +19,23 @@ public class DemoServices {
         if (!ServiceRegistry.isRegistered(IOpportunitySelector.class)) {
             ServiceRegistry.register(IOpportunitySelector.class, new OpportunitySelector());
         }
+        if (!ServiceRegistry.isRegistered(IAccountRepository.class)) {
+            ServiceRegistry.register(
+                IAccountRepository.class,
+                new AccountRepository(
+                    new AccountSelector(),
+                    (IRecordMutator) ServiceRegistry.resolve(IRecordMutator.class)
+                )
+            );
+        }
+        if (!ServiceRegistry.isRegistered(IOpportunityRepository.class)) {
+            ServiceRegistry.register(
+                IOpportunityRepository.class,
+                new OpportunityRepository(
+                    new OpportunitySelector(),
+                    (IRecordMutator) ServiceRegistry.resolve(IRecordMutator.class)
+                )
+            );
+        }
     }
 }

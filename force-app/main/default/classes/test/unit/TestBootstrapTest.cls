@@ -22,6 +22,7 @@ private class TestBootstrapTest extends BaseTest {
         IEventBus eventBus = (IEventBus) ServiceRegistry.resolve(IEventBus.class);
         eventBus.publish(new List<SObject>{ new Account(Name = 'Test') });
         System.assertEquals(1, ((MockEventBus) eventBus).published.size());
+
         assertFastTest();
     }
 
