@@ -3,6 +3,7 @@
  */
 @isTest
 private class ServiceRegistryTest extends BaseTest {
+    private interface UnregisteredService {}
     @isTest
     static void registerAndResolveReturnsInstance() {
         ServiceRegistry.reset();
@@ -39,6 +40,30 @@ private class ServiceRegistryTest extends BaseTest {
         System.assert(ServiceRegistry.resolve(IEventBus.class) instanceof SystemEventBus);
         System.assert(ServiceRegistry.resolve(IRecordMutator.class) instanceof SystemRecordMutator);
         System.assert(ServiceRegistry.resolve(IQueueableJob.class) instanceof NoopQueueableJob);
+        assertFastTest();
+    }
+
+    @isTest
+    static void resolveBootstrapsInTestsWhenEnabled() {
+        ServiceRegistry.reset();
+        ServiceRegistry.allowTestBootstrap = true;
+
+        System.assert(ServiceRegistry.resolve(IClock.class) instanceof SystemClock);
+        System.assert(ServiceRegistry.isRegistered(IHttpClient.class));
+        System.assert(ServiceRegistry.isRegistered(IQueueableJob.class));
+        assertFastTest();
+    }
+
+    @isTest
+    static void resolveThrowsAfterBootstrapWhenMissing() {
+        ServiceRegistry.reset();
+        ServiceRegistry.allowTestBootstrap = true;
+        try {
+            ServiceRegistry.resolve(UnregisteredService.class);
+            System.assert(false, 'Expected ServiceException for missing registration after bootstrap.');
+        } catch (ServiceRegistry.ServiceException ex) {
+            System.assert(ex.getMessage().contains('Bind an implementation'));
+        }
         assertFastTest();
     }
 }

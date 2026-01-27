@@ -18,6 +18,8 @@
 public class ServiceRegistry {
     private static Map<Type, Object> services = new Map<Type, Object>();
     private static Boolean bootstrapped = false;
+    @TestVisible
+    static Boolean allowTestBootstrap = false;
 
     public static void register(Type iface, Object impl) {
         services.put(iface, impl);
@@ -32,7 +34,7 @@ public class ServiceRegistry {
             return services.get(iface);
         }
 
-        if (Test.isRunningTest()) {
+        if (Test.isRunningTest() && !allowTestBootstrap) {
             throw new ServiceException(
                 'No service registered for ' + String.valueOf(iface) +
                 '. Tests should call TestServiceRegistry.reset() or register a mock before resolving.'
@@ -59,6 +61,7 @@ public class ServiceRegistry {
     static void reset() {
         services.clear();
         bootstrapped = false;
+        allowTestBootstrap = false;
     }
 
     public class ServiceException extends Exception {}

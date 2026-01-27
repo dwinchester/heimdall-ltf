@@ -14,8 +14,8 @@ sf org create scratch \
   --set-default \
   --alias "${ORG_ALIAS}"
 
-# echo "Deploying core framework..."
-# sf project deploy start --source-dir force-app
+echo "Deploying core framework..."
+sf project deploy start --source-dir force-app
 
 echo "Deploying examples (optional but recommended)..."
 sf project deploy start --source-dir examples/force-app
