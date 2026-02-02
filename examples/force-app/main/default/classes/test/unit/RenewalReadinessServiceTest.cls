@@ -54,8 +54,9 @@ private class RenewalReadinessServiceTest extends BaseTest {
             today,
             now
         );
-        System.assertEquals(25, o4.score);
-        System.assertEquals('Red', o4.status);
+        System.assertEquals(true, o4.blocked);
+        System.assertEquals(null, o4.score);
+        System.assertEquals(null, o4.status);
 
         RenewalReadinessService.ReadinessResult o5 = RenewalReadinessService.calculateReadiness(
             opp(today.addDays(7), 'Renewal'),

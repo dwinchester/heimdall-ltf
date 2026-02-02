@@ -65,12 +65,12 @@ private class RenewalReadinessServiceDmlTest extends BaseTest {
                 .RenewalReadinessStatus__c
         );
         System.assertEquals(
-            25,
+            null,
             savedOpps.get(data.oppsByKey.get(RenewalTestDataFactory.KEY_O4).Id)
                 .RenewalHealthScore__c
         );
         System.assertEquals(
-            'Red',
+            null,
             savedOpps.get(data.oppsByKey.get(RenewalTestDataFactory.KEY_O4).Id)
                 .RenewalReadinessStatus__c
         );
@@ -100,7 +100,7 @@ private class RenewalReadinessServiceDmlTest extends BaseTest {
             FROM Task
             WHERE Subject = :RenewalReadinessService.AT_RISK_TASK_SUBJECT
         ];
-        System.assertEquals(4, tasks.size());
+        System.assertEquals(3, tasks.size());
 
         Map<Id, Account> savedAccounts = new Map<Id, Account>([
             SELECT Id, RenewalReadinessSummary__c, Name
@@ -113,7 +113,7 @@ private class RenewalReadinessServiceDmlTest extends BaseTest {
         ]);
 
         System.assertEquals(
-            '2 renewals: 0 Green, 0 Amber, 2 Red',
+            '1 renewals: 0 Green, 0 Amber, 1 Red',
             savedAccounts.get(data.accountsByKey.get(RenewalTestDataFactory.KEY_A_LOW).Id)
                 .RenewalReadinessSummary__c
         );
@@ -128,7 +128,6 @@ private class RenewalReadinessServiceDmlTest extends BaseTest {
                 .RenewalReadinessSummary__c
         );
 
-        // Allow a bit more CPU for the extra O4 recalculation path.
         TestLimits.assertWithin(20, 10, 400);
     }
 }

@@ -20,13 +20,6 @@ public class RenewalLineItemTriggerHandler extends TriggerHandler {
     /**
      * Enforce required risk reason when marking an item as at risk.
      */
-    public override void beforeInsert(List<SObject> newList) {
-        validateRiskReason(newList);
-    }
-
-    /**
-     * Enforce required risk reason when marking an item as at risk.
-     */
     public override void beforeUpdate(List<SObject> newList, Map<Id, SObject> oldMap) {
         validateRiskReason(newList);
     }

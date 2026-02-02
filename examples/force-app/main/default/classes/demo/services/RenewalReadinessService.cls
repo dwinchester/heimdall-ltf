@@ -92,6 +92,7 @@ public class RenewalReadinessService implements IRenewalReadinessService {
         List<Opportunity> updates = new List<Opportunity>();
         Map<Id, ReadinessResult> results = new Map<Id, ReadinessResult>();
         Set<Id> accountIdsForSummary = new Set<Id>();
+        Set<Id> blockedOppIds = new Set<Id>();
 
         for (Opportunity opp : renewals) {
             List<OpportunityLineItem> items =
@@ -99,14 +100,24 @@ public class RenewalReadinessService implements IRenewalReadinessService {
                 ? lineItemsByOpp.get(opp.Id)
                 : new List<OpportunityLineItem>();
             Account acct = accounts.get(opp.AccountId);
-        ReadinessResult result = calculateReadiness(opp, items, acct, today, now);
-            results.put(opp.Id, result);
-            updates.add(new Opportunity(
-                Id = opp.Id,
-                RenewalHealthScore__c = result.score,
-                RenewalReadinessStatus__c = result.status,
-                LastReadinessCalc__c = result.lastCalculated
-            ));
+            ReadinessResult result = calculateReadiness(opp, items, acct, today, now);
+            if (result.blocked == true) {
+                blockedOppIds.add(opp.Id);
+                updates.add(new Opportunity(
+                    Id = opp.Id,
+                    RenewalHealthScore__c = null,
+                    RenewalReadinessStatus__c = null,
+                    LastReadinessCalc__c = null
+                ));
+            } else {
+                results.put(opp.Id, result);
+                updates.add(new Opportunity(
+                    Id = opp.Id,
+                    RenewalHealthScore__c = result.score,
+                    RenewalReadinessStatus__c = result.status,
+                    LastReadinessCalc__c = result.lastCalculated
+                ));
+            }
             if (opp.AccountId != null) {
                 accountIdsForSummary.add(opp.AccountId);
             }
@@ -124,6 +135,7 @@ public class RenewalReadinessService implements IRenewalReadinessService {
         }
 
         handleAtRiskTasks(results);
+        clearAtRiskTasks(blockedOppIds);
         updateAccountSummaries(accountIdsForSummary);
     }
 
@@ -230,6 +242,11 @@ public class RenewalReadinessService implements IRenewalReadinessService {
             }
         }
 
+        if (riskBlankReason) {
+            result.blocked = true;
+            return result;
+        }
+
         // Line item adjustments with caps.
         Integer confirmedBonus = confirmedCount * 10;
         if (confirmedBonus > 30) {
@@ -242,9 +259,6 @@ public class RenewalReadinessService implements IRenewalReadinessService {
 
         score += confirmedBonus;
         score -= riskPenalty;
-        if (riskBlankReason) {
-            score -= 10;
-        }
 
         // Account priority bonus.
         score += accountPriorityBonus(acct);
@@ -352,6 +366,18 @@ public class RenewalReadinessService implements IRenewalReadinessService {
         if (!toDelete.isEmpty()) {
             taskRepository.deleteRecords(toDelete);
         }
+    }
+
+    private void clearAtRiskTasks(Set<Id> opportunityIds) {
+        if (opportunityIds == null || opportunityIds.isEmpty()) {
+            return;
+        }
+        List<Task> existing =
+            taskRepository.getByOpportunityIds(opportunityIds, AT_RISK_TASK_SUBJECT);
+        if (existing == null || existing.isEmpty()) {
+            return;
+        }
+        taskRepository.deleteRecords(existing);
     }
 
     private void updateAccountSummaries(Set<Id> accountIds) {
@@ -486,6 +512,7 @@ public class RenewalReadinessService implements IRenewalReadinessService {
         public Integer score;
         public String status;
         public Datetime lastCalculated;
+        public Boolean blocked = false;
     }
 
     public class SummaryCounts {
