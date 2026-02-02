@@ -32,6 +32,14 @@ public class OpportunityRepository implements IOpportunityRepository {
         return selector.getClosingThisQuarter(region, ownerId);
     }
 
+    public List<Opportunity> getRenewalsByAccountIds(Set<Id> accountIds) {
+        return selector.getRenewalsByAccountIds(accountIds);
+    }
+
+    public Database.QueryLocator getStaleRenewalQuery(Datetime cutoff) {
+        return selector.getStaleRenewalQuery(cutoff);
+    }
+
     public Database.SaveResult[] insertRecords(List<Opportunity> records) {
         if (records == null || records.isEmpty()) {
             return new Database.SaveResult[] {};

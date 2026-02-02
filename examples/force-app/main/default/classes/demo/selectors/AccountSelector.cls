@@ -12,7 +12,7 @@ public class AccountSelector implements IAccountSelector {
      */
     public Account getById(Id accountId) {
         return [
-            SELECT Id, Name, Description
+            SELECT Id, Name, Description, CustomerPriority__c, RenewalReadinessSummary__c
             FROM Account
             WHERE Id = :accountId
         ];
@@ -29,7 +29,7 @@ public class AccountSelector implements IAccountSelector {
         }
 
         return new Map<Id, Account>([
-            SELECT Id, Name, Description
+            SELECT Id, Name, Description, CustomerPriority__c, RenewalReadinessSummary__c
             FROM Account
             WHERE Id IN :accountIds
         ]);
@@ -47,7 +47,7 @@ public class AccountSelector implements IAccountSelector {
         }
 
         return [
-            SELECT Id, Name, Description, BillingState
+            SELECT Id, Name, Description, BillingState, CustomerPriority__c, RenewalReadinessSummary__c
             FROM Account
             WHERE BillingState = :region
         ];
@@ -64,7 +64,7 @@ public class AccountSelector implements IAccountSelector {
         }
 
         return [
-            SELECT Id, Name, Description, OwnerId
+            SELECT Id, Name, Description, OwnerId, CustomerPriority__c, RenewalReadinessSummary__c
             FROM Account
             WHERE OwnerId = :ownerId
         ];

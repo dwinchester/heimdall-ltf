@@ -12,7 +12,8 @@ public class OpportunitySelector implements IOpportunitySelector {
      */
     public Opportunity getById(Id opportunityId) {
         return [
-            SELECT Id, Name, Amount, CloseDate, StageName, AccountId, OwnerId
+            SELECT Id, Name, Amount, CloseDate, StageName, AccountId, OwnerId,
+                Type, IsClosed, RenewalReadinessStatus__c, RenewalHealthScore__c, LastReadinessCalc__c
             FROM Opportunity
             WHERE Id = :opportunityId
         ];
@@ -29,7 +30,8 @@ public class OpportunitySelector implements IOpportunitySelector {
         }
 
         return new Map<Id, Opportunity>([
-            SELECT Id, Name, Amount, CloseDate, StageName, AccountId, OwnerId
+            SELECT Id, Name, Amount, CloseDate, StageName, AccountId, OwnerId,
+                Type, IsClosed, RenewalReadinessStatus__c, RenewalHealthScore__c, LastReadinessCalc__c
             FROM Opportunity
             WHERE Id IN :opportunityIds
         ]);
@@ -46,7 +48,8 @@ public class OpportunitySelector implements IOpportunitySelector {
         }
 
         return [
-            SELECT Id, Name, Amount, CloseDate, StageName, AccountId
+            SELECT Id, Name, Amount, CloseDate, StageName, AccountId,
+                Type, IsClosed, RenewalReadinessStatus__c, RenewalHealthScore__c, LastReadinessCalc__c
             FROM Opportunity
             WHERE AccountId = :accountId
         ];
@@ -82,11 +85,48 @@ public class OpportunitySelector implements IOpportunitySelector {
         }
 
         return [
-            SELECT Id, Name, Amount, CloseDate, StageName, AccountId, OwnerId
+            SELECT Id, Name, Amount, CloseDate, StageName, AccountId, OwnerId,
+                Type, IsClosed, RenewalReadinessStatus__c, RenewalHealthScore__c, LastReadinessCalc__c
             FROM Opportunity
             WHERE OwnerId = :ownerId
             AND CloseDate = THIS_QUARTER
             AND Account.BillingState = :region
         ];
+    }
+
+    /**
+     * Fetches open Renewal Opportunities for a set of Accounts.
+     *
+     * Returns an empty list when {@code accountIds} is null/empty.
+     */
+    public List<Opportunity> getRenewalsByAccountIds(Set<Id> accountIds) {
+        if (accountIds == null || accountIds.isEmpty()) {
+            return new List<Opportunity>();
+        }
+
+        return [
+            SELECT Id, Name, Amount, CloseDate, StageName, AccountId,
+                Type, IsClosed, RenewalReadinessStatus__c, RenewalHealthScore__c, LastReadinessCalc__c
+            FROM Opportunity
+            WHERE AccountId IN :accountIds
+            AND Type = 'Renewal'
+            AND IsClosed = false
+        ];
+    }
+
+    /**
+     * Returns a query locator for stale open Renewal Opportunities.
+     */
+    public Database.QueryLocator getStaleRenewalQuery(Datetime cutoff) {
+        if (cutoff == null) {
+            cutoff = System.now();
+        }
+        return Database.getQueryLocator([
+            SELECT Id
+            FROM Opportunity
+            WHERE Type = 'Renewal'
+            AND IsClosed = false
+            AND (LastReadinessCalc__c = null OR LastReadinessCalc__c < :cutoff)
+        ]);
     }
 }

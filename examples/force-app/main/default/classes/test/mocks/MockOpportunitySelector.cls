@@ -61,4 +61,30 @@ public class MockOpportunitySelector implements IOpportunitySelector {
             )
         };
     }
+
+    public List<Opportunity> getRenewalsByAccountIds(Set<Id> accountIds) {
+        if (accountIds == null || accountIds.isEmpty()) {
+            return new List<Opportunity>();
+        }
+        List<Opportunity> results = new List<Opportunity>();
+        for (Id accountId : accountIds) {
+            results.add(new Opportunity(
+                Id = '006000000000009AAA',
+                Name = 'Mock Renewal Opportunity',
+                AccountId = accountId,
+                Type = 'Renewal',
+                CloseDate = Date.today().addDays(30),
+                StageName = 'Negotiation/Review'
+            ));
+        }
+        return results;
+    }
+
+    public Database.QueryLocator getStaleRenewalQuery(Datetime cutoff) {
+        return Database.getQueryLocator([
+            SELECT Id
+            FROM Opportunity
+            WHERE Id = null
+        ]);
+    }
 }

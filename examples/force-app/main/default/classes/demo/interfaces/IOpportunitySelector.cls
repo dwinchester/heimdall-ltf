@@ -49,4 +49,20 @@ public interface IOpportunitySelector {
      * @return List of Opportunities matching the criteria
      */
     List<Opportunity> getClosingThisQuarter(String region, Id ownerId);
+
+    /**
+     * Fetches open Renewal Opportunities for a set of Accounts.
+     *
+     * @param accountIds Account Ids to filter by
+     * @return List of Renewal Opportunities
+     */
+    List<Opportunity> getRenewalsByAccountIds(Set<Id> accountIds);
+
+    /**
+     * Returns a query locator for stale open Renewal Opportunities.
+     *
+     * @param cutoff Last calculation cutoff
+     * @return Query locator for stale renewals
+     */
+    Database.QueryLocator getStaleRenewalQuery(Datetime cutoff);
 }
