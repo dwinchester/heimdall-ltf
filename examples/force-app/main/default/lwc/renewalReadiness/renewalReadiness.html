@@ -1,0 +1,134 @@
+<template>
+    <article class="slds-card renewal-card">
+        <div class="slds-card__header slds-grid renewal-card__header">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning-icon
+                        icon-name="standard:opportunity"
+                        size="small"
+                        alternative-text="Opportunity"
+                    >
+                    </lightning-icon>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>Renewal Readiness</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner renewal-card__body">
+            <template if:true={isLoading}>
+                <lightning-spinner size="small"></lightning-spinner>
+            </template>
+            <template if:true={errorMessage}>
+                <div class="slds-text-color_error">
+                    {errorMessage}
+                </div>
+            </template>
+            <template if:true={dto}>
+                <div class="slds-p-vertical_x-small">
+                    <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <span class="slds-text-title_caps">Score</span>
+                            <div class="slds-text-heading_small">{dto.score}</div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <span class="slds-text-title_caps">Status</span>
+                            <div class="slds-text-heading_small">{dto.status}</div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                            <span class="slds-text-title_caps">Last Calculated</span>
+                            <div class="slds-text-body_regular">
+                                <lightning-formatted-date-time
+                                    value={dto.lastCalculated}
+                                    year="numeric"
+                                    month="short"
+                                    day="2-digit"
+                                    hour="2-digit"
+                                    minute="2-digit"
+                                >
+                                </lightning-formatted-date-time>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <template if:true={hasLineItems}>
+                    <div class="slds-m-top_small">
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th scope="col">Qty</th>
+                                    <th scope="col">Total Price</th>
+                                    <th scope="col">Confirmed</th>
+                                    <th scope="col">At Risk</th>
+                                    <th scope="col">Risk Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={dto.lineItems} for:item="item">
+                                    <tr key={item.id}>
+                                        <td>{item.quantity}</td>
+                                        <td>
+                                            <lightning-formatted-number
+                                                value={item.totalPrice}
+                                                format-style="currency"
+                                            >
+                                            </lightning-formatted-number>
+                                        </td>
+                                        <td>
+                                            <lightning-input
+                                                type="checkbox"
+                                                checked={item.confirmed}
+                                                data-id={item.id}
+                                                data-field="confirmed"
+                                                onchange={handleFieldChange}
+                                            >
+                                            </lightning-input>
+                                        </td>
+                                        <td>
+                                            <lightning-input
+                                                type="checkbox"
+                                                checked={item.riskFlag}
+                                                data-id={item.id}
+                                                data-field="riskFlag"
+                                                onchange={handleFieldChange}
+                                            >
+                                            </lightning-input>
+                                        </td>
+                                        <td>
+                                            <lightning-input
+                                                type="text"
+                                                value={item.riskReason}
+                                                data-id={item.id}
+                                                data-field="riskReason"
+                                                onchange={handleFieldChange}
+                                            >
+                                            </lightning-input>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </template>
+                <template if:false={hasLineItems}>
+                    <div class="slds-text-body_regular">
+                        No line items available.
+                    </div>
+                </template>
+            </template>
+        </div>
+        <template if:true={dto}>
+            <div class="slds-card__footer slds-text-align_right">
+                <lightning-button
+                    variant="brand"
+                    label="Save Changes"
+                    onclick={handleSave}
+                >
+                </lightning-button>
+            </div>
+        </template>
+    </article>
+</template>

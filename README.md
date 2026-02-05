@@ -7,6 +7,52 @@ This repo is a working Salesforce DX scaffold focused on **fast, deterministic, 
 Start here: see the [Quick Start](docs/quick-start.md) for a copy/paste setup and your first DML-less unit test.
 Scratch org setup script: `./scripts/setup_scratch_org.sh`.
 
+## Quick Start
+
+If you want to explore the demo implementation, start with the Renewal Readiness example:
+
+1. Read the case study in `examples/README.md` for the scenario, data contract, and test expectations.
+2. Deploy the `examples/` metadata to a scratch org or sandbox.
+3. Run a focused test class from `examples/force-app/main/default/classes/test/...` to validate your setup.
+
+For framework-only usage, follow the steps in `docs/quick-start.md` and then apply the same patterns in your own code.
+
+## Prerequisites
+
+- Salesforce CLI (`sf`) authenticated to a scratch org or sandbox for Apex tests.
+- Node.js and npm for LWC unit tests (`npm run test:unit`).
+- A Salesforce DX workspace with the source deployed to the target org.
+
+> [!TIP]
+> Use a scratch org for fast iteration and predictable metadata state.
+
+## Why DML-less tests?
+
+DML-less unit tests are fast, deterministic, and easy to reason about because they avoid org state and database latency.
+The framework uses dependency injection so production code depends on interfaces instead of platform APIs. Tests then
+register mocks to validate business logic without inserting records or querying the database, while higher-tier tests
+cover integration paths with minimal DML only where necessary.
+
+## How to add a new scenario?
+
+Create a new example package under `examples/force-app/main/default/` that mirrors the production layout. Define your
+custom fields in `objects/`, write triggers and services in `classes/` and `triggers/`, and add tests under
+`classes/test/` using the same taxonomy (`unit`, `service`, `integration`). If the scenario includes UI, add an LWC under
+`lwc/` with a Jest test in `__tests__/`. Update `examples/README.md` with the new scenario summary and expectations.
+
+## How to extend the data contract?
+
+Add new records, edge cases, or bulk patterns in the "Canonical test data contract" section of
+`examples/README.md`. Keep the expected outcomes explicit and deterministic so different implementations can be compared
+consistently. When adding new fields or objects, also update the metadata under `examples/force-app/main/default/objects`.
+
+## Troubleshooting
+
+- **Apex tests fail to run**: ensure `sf org list` shows an authenticated org and that metadata is deployed.
+- **Jest not found**: run `npm install` from the repo root.
+- **Husky errors on install**: this is expected in restricted environments; tests still run.
+- **Engine warnings from npm**: some dev dependencies expect Node 20+, but tests still run on Node 18 in CI if compatible.
+
 ## Core Principles
 
 - **No database unless unavoidable**

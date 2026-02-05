@@ -1,0 +1,15 @@
+.slds-text-title_caps {
+    display: block;
+}
+
+.renewal-card.slds-card {
+    border: 1px solid var(--slds-c-card-color-border, #C9C9C9) !important;
+    border-radius: var(--slds-g-radius-border-2, 0.5rem) !important;
+    overflow: hidden;
+    background: var(--slds-c-card-color-background, #FFFFFF);
+}
+
+.renewal-card__header,
+.renewal-card__body {
+    padding: 1rem !important;
+}
